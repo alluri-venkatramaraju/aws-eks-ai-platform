@@ -1,0 +1,4 @@
+aws_region = "us-east-1"
+project_name = "eks-ai-platform"
+environment = "dev"
+enable = false

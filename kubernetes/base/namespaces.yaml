@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-platform
+  labels: { pod-security.kubernetes.io/enforce: restricted, pod-security.kubernetes.io/audit: restricted, pod-security.kubernetes.io/warn: restricted }
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: model-serving
+  labels: { pod-security.kubernetes.io/enforce: restricted, pod-security.kubernetes.io/audit: restricted, pod-security.kubernetes.io/warn: restricted }
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: batch-training
+  labels: { pod-security.kubernetes.io/enforce: restricted, pod-security.kubernetes.io/audit: restricted, pod-security.kubernetes.io/warn: restricted }

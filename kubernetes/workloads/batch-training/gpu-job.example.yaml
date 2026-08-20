@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata: { name: example-gpu-training, namespace: batch-training }
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext: { runAsNonRoot: true, runAsUser: 65532, runAsGroup: 65532, seccompProfile: { type: RuntimeDefault } }
+      nodeSelector: { workload-class: gpu }
+      tolerations: [{ key: nvidia.com/gpu, operator: Equal, value: "true", effect: NoSchedule }]
+      containers:
+        - name: trainer
+          image: nvcr.io/nvidia/cuda:12.4.1-base-ubuntu22.04@sha256:0f6bfcbf267e65123bcc2287e2153dedfc0f24772fb5ce84afe16ac4b2fada95
+          imagePullPolicy: Always
+          command: [nvidia-smi]
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: [ALL] } }
+          resources: { requests: { nvidia.com/gpu: "1", cpu: "1", memory: 2Gi }, limits: { nvidia.com/gpu: "1", cpu: "2", memory: 4Gi } }

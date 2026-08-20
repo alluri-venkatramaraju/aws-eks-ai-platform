@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      github-actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      python-runtime:
+        patterns: ["opentelemetry-*"]
+      python-development:
+        dependency-type: development
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directory: /terraform/environments/dev
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directory: /terraform/environments/stage
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directory: /terraform/environments/prod
+    schedule: { interval: weekly }

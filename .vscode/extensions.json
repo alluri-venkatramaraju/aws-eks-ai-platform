@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "sankarmantripragada.markdown-mermaid-viewer",
+    "hashicorp.terraform",
+    "redhat.vscode-yaml",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-python.python"
+  ]
+}

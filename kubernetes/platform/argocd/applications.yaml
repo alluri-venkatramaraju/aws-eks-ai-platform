@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: ai-platform, namespace: argocd }
+spec:
+  sourceRepos: ["https://github.com/venkatramarajualluri/aws-eks-ai-platform.git", "https://charts.external-secrets.io", "public.ecr.aws/karpenter", "https://prometheus-community.github.io/helm-charts", "https://open-telemetry.github.io/opentelemetry-helm-charts"]
+  destinations: [{ namespace: "*", server: "https://kubernetes.default.svc" }]
+  clusterResourceWhitelist: [{ group: "*", kind: "*" }]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: platform-config, namespace: argocd }
+spec:
+  project: ai-platform
+  source: { repoURL: "https://github.com/venkatramarajualluri/aws-eks-ai-platform.git", targetRevision: main, path: gitops/dev }
+  destination: { server: "https://kubernetes.default.svc" }
+  syncPolicy: { automated: { prune: true, selfHeal: true }, syncOptions: [CreateNamespace=true, ServerSideApply=true] }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: external-secrets, namespace: argocd }
+spec:
+  project: ai-platform
+  source: { repoURL: "https://charts.external-secrets.io", chart: external-secrets, targetRevision: 0.10.5, helm: { values: "installCRDs: true" } }
+  destination: { server: "https://kubernetes.default.svc", namespace: external-secrets }
+  syncPolicy: { automated: { prune: true, selfHeal: true }, syncOptions: [CreateNamespace=true] }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: karpenter, namespace: argocd }
+spec:
+  project: ai-platform
+  source: { repoURL: "public.ecr.aws/karpenter", chart: karpenter, targetRevision: 1.11.3, helm: { values: "settings:\n  clusterName: eks-ai-platform-dev\n" } }
+  destination: { server: "https://kubernetes.default.svc", namespace: karpenter }
+  syncPolicy: { automated: { prune: true, selfHeal: true }, syncOptions: [CreateNamespace=true] }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: kube-prometheus-stack, namespace: argocd }
+spec:
+  project: ai-platform
+  source: { repoURL: "https://prometheus-community.github.io/helm-charts", chart: kube-prometheus-stack, targetRevision: 66.3.1, helm: { values: "prometheus:\n  prometheusSpec:\n    retention: 15d\n" } }
+  destination: { server: "https://kubernetes.default.svc", namespace: monitoring }
+  syncPolicy: { automated: { prune: true, selfHeal: true }, syncOptions: [CreateNamespace=true, ServerSideApply=true] }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: opentelemetry-operator, namespace: argocd }
+spec:
+  project: ai-platform
+  source: { repoURL: "https://open-telemetry.github.io/opentelemetry-helm-charts", chart: opentelemetry-operator, targetRevision: 0.77.0 }
+  destination: { server: "https://kubernetes.default.svc", namespace: opentelemetry-operator-system }
+  syncPolicy: { automated: { prune: true, selfHeal: true }, syncOptions: [CreateNamespace=true] }

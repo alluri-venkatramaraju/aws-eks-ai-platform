@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: model-server-dashboard, namespace: ai-platform, labels: { grafana_dashboard: "1" } }
+data:
+  model-server.json: |
+    {"title":"Model Server","schemaVersion":39,"panels":[{"type":"timeseries","title":"Request rate","targets":[{"expr":"rate(model_requests_total[5m])"}]}]}
